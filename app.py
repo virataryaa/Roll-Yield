@@ -327,7 +327,7 @@ pivot = (
 pivot.columns = [MONTHS[m - 1] for m in pivot.columns]
 pivot = pivot.sort_index(ascending=False)
 
-z      = (pivot.values * 100).round(2)
+z      = (pivot.values.astype(float) * 100).round(2)
 years  = [str(y) for y in pivot.index]
 months = list(pivot.columns)
 text_mat = [[f"{v:.1f}%" if not np.isnan(v) else "" for v in row] for row in z]

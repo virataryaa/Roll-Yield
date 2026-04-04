@@ -315,6 +315,7 @@ hm_comm = st.selectbox(
 st.markdown(lbl(f"Roll Yield Heatmap · {NAMES[hm_comm]} · Monthly Avg"), unsafe_allow_html=True)
 
 hm_s = df_fil[df_fil["Commodity"] == hm_comm].copy()
+hm_s["Roll_Yield_1yr"] = pd.to_numeric(hm_s["Roll_Yield_1yr"], errors="coerce")
 hm_s["Year"]  = hm_s["Date"].dt.year
 hm_s["Month"] = hm_s["Date"].dt.month
 
@@ -324,7 +325,12 @@ pivot = (
     .reset_index()
     .pivot(index="Year", columns="Month", values="Roll_Yield_1yr")
 )
-pivot.columns = [MONTHS[m - 1] for m in pivot.columns]
+
+if pivot.empty:
+    st.info("No heatmap data for selected range.")
+    st.stop()
+
+pivot.columns = [MONTHS[int(m) - 1] for m in pivot.columns]
 pivot = pivot.sort_index(ascending=False)
 
 z      = (pivot.values.astype(float) * 100).round(2)
